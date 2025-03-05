@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useReactTable, getCoreRowModel, flexRender, createColumnHelper } from "@tanstack/react-table";
 
 const columnHelper = createColumnHelper();
 
 const PersonTable = () => {
 
-    const data = [
+    const [data, setData] = useState([
         {
             id: 1,
             name: "John Doe",
@@ -20,7 +20,7 @@ const PersonTable = () => {
             email: "jane.smith@example.com",
             address: "456 Elm St, Los Angeles, CA 90001"
         }
-    ]
+    ]);
 
     const columns = [
         columnHelper.accessor("id", { header: "ID" }),
@@ -36,9 +36,23 @@ const PersonTable = () => {
         getCoreRowModel: getCoreRowModel()
     });
 
+    const addRow = () => {
+        const newRow = {
+            id: data.length + 1,
+            name: "New Person",
+            age: 25,
+            email: "new.person@example.com",
+            address: "789 Oak St., SF"
+        };
+        setData((prevData) => [newRow, ...prevData])
+    };
+
     return (
         <div style={{ padding: "20px", maxWidth: "600px", margin: "auto" }}>
             <h2>Person Details</h2>
+            <button onClick={addRow} style={{ marginBottom: "10px", padding: "10px", backgroundColor: "#4CAF50", color: "white", border: "none", borderRadius: "4px" }}>
+                Add New Person
+            </button>
             <table border="1" cellPadding="10" style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                     {table.getHeaderGroups().map((headerGroup) => (
