@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useReactTable, getCoreRowModel, flexRender, createColumnHelper } from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel, getPaginationRowModel, flexRender, createColumnHelper } from "@tanstack/react-table";
 
 const columnHelper = createColumnHelper();
 
@@ -30,10 +30,29 @@ const PersonTable = () => {
         columnHelper.accessor("address", { header: "Address" })
     ];
 
+    const [pageIndex, setPageIndex] = useState(0);
+    const [pageSize, setPageSize] = useState(3);
+
     const table = useReactTable({
         data,
         columns,
-        getCoreRowModel: getCoreRowModel()
+        pageCount: Math.ceil(data.length / pageSize),
+        state: {
+            pagination: {
+                pageIndex,
+                pageSize
+            }
+        },
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        onPaginationChange: (updater) => {
+            const newState = updater({
+                pageIndex,
+                pageSize
+            });
+            setPageIndex(newState.pageIndex);
+            setPageSize(newState.pageSize);
+        }
     });
 
     const addRow = () => {
@@ -77,8 +96,26 @@ const PersonTable = () => {
                     ))}
                 </tbody>
             </table>
+
+            <div style={{ marginTop: "20px" }}>
+                    <button
+                    onClick={() => setPageIndex(Math.max(0, pageIndex - 1))}
+                    disabled={pageIndex === 0}
+                    style={{ padding: "5px 10px", marginRight: "5px" }}
+                    >
+                        Previous
+                    </button>
+                    <span> Page {pageIndex +1} of {Math.ceil(data.length / pageSize )}</span>
+                    <button
+                    onClick={() => setPageIndex(Math.min(Math.ceil(data.length / pageSize) - 1, pageIndex + 1))}
+                    disabled={ pageIndex === Math.ceil(data.length / pageSize) - 1}
+                    style={{ padding: "5px 10px", marginLeft: "5px"}}
+                    >
+                        Next
+                    </button>
+            </div>
         </div>
-    )
+    );
 };
 
 export default PersonTable;
